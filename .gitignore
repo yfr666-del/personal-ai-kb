@@ -1,0 +1,18 @@
+# 虚拟环境
+.venv/
+venv/
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+
+# 密钥 —— 这一条最重要
+.env
+
+# 本地数据
+data/
+
+# 测试与工具
+.pytest_cache/
+.idea/
+.vscode/
