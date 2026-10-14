@@ -1,0 +1,9 @@
+# 运行依赖
+fastapi==0.143.0
+uvicorn==0.54.0
+pydantic==2.13.5
+pydantic-settings==2.15.0
+python-multipart==0.0.32
+
+# 开发依赖
+pytest==9.1.1
