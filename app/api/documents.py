@@ -1,19 +1,18 @@
-"""文档相关接口。"""
+"""文档相关接口。
 
-from uuid import uuid4
+这一层只干两件事：把 HTTP 的东西翻译成业务调用，把结果/错误翻译回 HTTP。
+真正的业务（校验、解析、切分、落盘）全在 app/services/ingest.py。
+"""
 
 from fastapi import APIRouter, HTTPException, UploadFile
 
-from app.models.document import ALLOWED_CONTENT_TYPES, ALLOWED_SUFFIXES, DocumentMeta
-from app.services.chunker import split_text
-from app.services.parser import ParseError, extract_text
+from app.models.document import ALLOWED_CONTENT_TYPES, ALLOWED_SUFFIXES
+from app.services.ingest import IngestError, ingest_document
 from app.services.storage import (
     DocumentNotFoundError,
     StorageError,
     list_documents,
     load_chunks,
-    save_chunks,
-    save_document,
 )
 
 router = APIRouter(prefix="/documents", tags=["documents"])
@@ -23,62 +22,19 @@ router = APIRouter(prefix="/documents", tags=["documents"])
 async def upload_document(file: UploadFile):
     """接收上传文件：校验 -> 解析 -> 切分 -> 落盘。
 
-    四关走完，这份文档才算真正"收进来"了。
+    这里读到的 file.filename / content_type 是浏览器报的，
+    不一定准 —— 具体怎么处理，在 ingest_document 里。
     """
     content = await file.read()
 
-    # 第一关：元信息校验（后缀、类型、大小）
-    # doc_id 由系统发（12 位随机十六进制），不用文件名 ——
-    # 文件名会重复，你传两次「笔记.md」就会互相覆盖。
     try:
-        meta = DocumentMeta(
-            doc_id=uuid4().hex[:12],
-            filename=file.filename,
-            content_type=file.content_type,
-            size_kb=max(1, len(content) // 1024),
-        )
-    except Exception as e:
+        return ingest_document(file.filename, file.content_type, content)
+    except IngestError as e:
+        # 400：用户的问题（格式不对、内容读不出来）
         raise HTTPException(status_code=400, detail=str(e))
-
-    # 第二关：把文件内容读成文字
-    try:
-        text = extract_text(file.filename, content)
-    except ParseError as e:
-        raise HTTPException(status_code=400, detail=f"解析失败：{e}")
-
-    # 第三关：切成小块（后面给每块算"意思坐标"要用）
-    # 切分参数直接取自 meta.chunk_config —— 模型里定好的规则，这里只管用
-    chunks = split_text(text, meta.chunk_config)
-
-    # 第四关：落盘。存原文件 + 一份 json（原文、块、元信息）
-    try:
-        save_document(meta.doc_id, meta.filename, content)
-        save_chunks(
-            meta.doc_id,
-            {
-                "doc_id": meta.doc_id,
-                "filename": meta.filename,
-                "content_type": meta.content_type,
-                "size_kb": meta.size_kb,
-                "uploaded_at": meta.uploaded_at.isoformat(),
-                "chunk_config": meta.chunk_config.model_dump(),
-                "text_length": len(text),
-                "chunk_count": len(chunks),
-                "text": text,
-                "chunks": chunks,
-            },
-        )
     except StorageError as e:
+        # 500：服务端的问题（磁盘写不进去）
         raise HTTPException(status_code=500, detail=f"落盘失败：{e}")
-
-    return {
-        "doc_id": meta.doc_id,
-        "meta": meta,
-        "size_bytes": len(content),
-        "text_length": len(text),
-        "chunk_count": len(chunks),
-        "first_chunk": chunks[0][:120],
-    }
 
 
 @router.get("/allowed")
