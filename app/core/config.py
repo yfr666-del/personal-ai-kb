@@ -36,6 +36,9 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     ollama_base_url: str = "http://localhost:11434"
     llm_model: str = "qwen3:4b"
+    # 嵌入要另用一个模型：聊天模型负责"说话"，嵌入模型负责"给意思定坐标"，
+    # 两者不是一回事，别指望 qwen3:4b 能顺便把向量也算好。
+    embed_model: str = "bge-m3"
 
     # 数据存储
     data_dir: Path = Path("./data")

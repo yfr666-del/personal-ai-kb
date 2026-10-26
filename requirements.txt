@@ -6,6 +6,7 @@ pydantic-settings==2.15.0
 python-multipart==0.0.32
 pypdf==6.20.1
 streamlit==1.65.0
+requests==2.34.2
 
 # 开发依赖
 pytest==9.1.1
