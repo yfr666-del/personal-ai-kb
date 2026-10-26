@@ -1,7 +1,14 @@
 """DocumentMeta 模型自检 —— 验证校验规则真的生效。
 
-用法：python check_models.py
+用法：python learning/check_models.py
 """
+
+import sys
+from pathlib import Path
+
+# 脚本搬进 learning/ 之后，父目录（项目根）就不在模块搜索路径里了，
+# 会导致 `import app` 失败。这两行把项目根加回去。
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pydantic import ValidationError
 

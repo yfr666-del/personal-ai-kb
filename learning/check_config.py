@@ -1,10 +1,17 @@
 """配置自检脚本。
 
-用法：python check_config.py
+用法：python learning/check_config.py
 
 验证方法：改一改 .env 里的 DEBUG（true/false），再跑一次，
 看输出有没有跟着变 —— 变了才说明配置真的从 .env 生效。
 """
+
+import sys
+from pathlib import Path
+
+# 脚本搬进 learning/ 之后，父目录（项目根）就不在模块搜索路径里了，
+# 会导致 `import app` 失败。这两行把项目根加回去。
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.core.config import settings
 

@@ -76,10 +76,11 @@ personal-ai-kb/
 │       └── storage.py  存储：把文件与块落到 data/ 目录
 ├── tests/           测试
 ├── data/            本地数据（原文件、切好的块），不进 Git
+├── blog/            项目笔记（第一篇讲目录结构为什么这么分）
+├── learning/        学习用脚本（Pydantic 实验、默写、自检），与项目代码分开
 ├── streamlit_app.py Streamlit 演示页
 ├── pytest.ini       pytest 配置
 ├── requirements.txt 依赖清单
-├── learn_pydantic.py / check_models.py / check_config.py   学习用自检脚本
 ├── .env             本地配置（含密钥，不进 Git）
 └── .env.example     配置模板（进 Git，新克隆的人照着填）
 ```
@@ -101,5 +102,5 @@ personal-ai-kb/
 - [x] M1 收资料链路：解析（PDF/txt/md）→ 切分（带重叠）→ 落盘
 - [x] M1 第一篇项目笔记（`blog/01-project-structure.md`）
 - [x] M1 Streamlit 演示页
-- [ ] M1 收尾：根目录草稿脚本归置
+- [x] M1 收尾：学习脚本移入 `learning/`，根目录只留项目代码
 - [ ] M2 RAG 最简闭环 + 20 题评估集
