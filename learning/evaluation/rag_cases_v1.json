@@ -1,0 +1,60 @@
+{
+  "version": "rag-cases-v1",
+  "created": "2026-10-25",
+  "source_note": "全部为内存中构造的公开教学资料，不读取主项目真实 data 目录，不含私人文档。",
+  "important": "以下事实是【教学资料自己定义的】，不是对真实项目版本、支持格式或本机硬件的核定。原始样本固定，后续版本更新须另记变更，不根据模型当次答案倒改标准。",
+  "sources": [
+    {
+      "doc_id": "demo-overview",
+      "chunk_index": 0,
+      "filename": "demo-overview.md",
+      "text": "这是一个教学知识库，演示版本为v0.1.0。"
+    },
+    {
+      "doc_id": "demo-formats",
+      "chunk_index": 0,
+      "filename": "demo-formats.md",
+      "text": "教学知识库接收PDF、TXT和Markdown文档。"
+    },
+    {
+      "doc_id": "demo-tests",
+      "chunk_index": 0,
+      "filename": "demo-tests.md",
+      "text": "在项目根目录使用python -m pytest运行测试。"
+    }
+  ],
+  "cases": [
+    {
+      "id": "E01",
+      "question": "演示版本是多少？",
+      "has_answer": true,
+      "supporting_sources": ["demo-overview#0"],
+      "expected_fact": "v0.1.0",
+      "check_stage": "prompt_check",
+      "retrieval_status": "not_run",
+      "answer_status": "not_run"
+    },
+    {
+      "id": "E02",
+      "question": "我可以把哪些类型的文件放进这个教学知识库？",
+      "has_answer": true,
+      "supporting_sources": ["demo-formats#0"],
+      "expected_fact": "PDF、TXT、Markdown",
+      "check_stage": "prompt_check",
+      "retrieval_status": "not_run",
+      "answer_status": "not_run"
+    },
+    {
+      "id": "E03",
+      "question": "教学知识库运行电脑的显卡型号是什么？",
+      "has_answer": false,
+      "supporting_sources": [],
+      "expected_fact": null,
+      "note": "资料完全没讲硬件，应当承认没有答案。本题不参加「支持片段命中率」的分母，单列为无答案拒答观察。",
+      "check_stage": "prompt_check",
+      "retrieval_status": "not_run",
+      "answer_status": "not_run"
+    }
+  ],
+  "scoring_note": "支持片段命中率的分母只算 has_answer=true 的题，E03 单列。命中一个支持片段不等于回答正确；RRF 分数不是概率也不是正确率。"
+}
